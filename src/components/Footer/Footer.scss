@@ -1,0 +1,92 @@
+.divider::before {
+  // content: url("../static/layeres.svg");
+  content: "";
+  aspect-ratio: 900/100;
+  width: 100vw;
+  left: 0;
+  top: 0;
+  position: absolute;
+  height: fit-content;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  background-image: url("../static/layers.svg");
+  transform: translateY(-100%);
+}
+footer.block-container {
+  margin: 0;
+  @apply mt-[18rem] md:mt-[15rem] xl:mt-[20rem];
+  position: relative;
+  background-color: var(--color-primary);
+  height: fit-content;
+}
+
+.footer {
+  &__links-container {
+    position: relative;
+  }
+  &__links {
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 75%;
+      width: 3px;
+      background-color: var(--color-neutral-light);
+    }
+  }
+  &--try-app {
+    background-color: rgba(var(--code-neutral-dark), 0.45);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--color-dark);
+    @apply rounded-lg md:w-1/2  w-2/3 py-2 px-2 md:px-4  max-w-lg;
+    box-shadow: 0 2px 3px 0 rgba(var(--code-dark), 0.7);
+    height: fit-content;
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    transform: translateY(-80%);
+    display: flex;
+    flex-direction: column;
+    @apply lg:grid grid-cols-[1fr_2fr] gap-2 justify-items-center  items-center;
+    // @extend .text-shadow;
+    // color: var(--color-neutral-light) !important;
+    @apply dark:text-slate-50 text-slate-900;
+  }
+  .social-links {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    @apply gap-7;
+    position: relative;
+    & > :first-child {
+      &::before {
+        content: "";
+        width: 30%;
+        height: 3px;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto 0;
+        position: absolute;
+        background-color: var(--color-neutral-light);
+      }
+    }
+    & > :last-child {
+      &::after {
+        content: "";
+        background-color: var(--color-neutral-light);
+        position: absolute;
+        width: 30%;
+        height: 3px;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto 0;
+      }
+    }
+  }
+}

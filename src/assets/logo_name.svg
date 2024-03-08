@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="123.45" height="75.62" viewBox="0 0 123.45 75.62">
+  <g id="Group_1" data-name="Group 1" transform="translate(-1177.385 -366.43)">
+    <g id="Layer_1" data-name="Layer 1" transform="translate(1064.025 323)">
+      <text id="Share" transform="translate(113.36 111.05)" fill="#312e4e" font-size="34.66"
+        font-family="Square721BT-Bold, Square721 BT" font-weight="700">
+        <tspan x="0" y="0">Share</tspan>
+      </text>
+      <text id="Parcel" transform="translate(114.81 79.43)" fill="#312e4e" font-size="37.45"
+        font-family="Square721BT-Bold, Square721 BT" font-weight="700">
+        <tspan x="0" y="0">Parcel</tspan>
+      </text>
+      <rect id="Rectangle_1" data-name="Rectangle 1" width="20.09" height="5.22" rx="1.95"
+        transform="translate(216.41 106.14)" fill="#ff5c00" />
+      <rect id="Rectangle_2" data-name="Rectangle 2" width="20.09" height="5.22" rx="1.95"
+        transform="translate(216.41 97.54)" fill="#312e4e" />
+      <rect id="Rectangle_3" data-name="Rectangle 3" width="20.09" height="5.22" rx="1.95"
+        transform="translate(216.41 88.94)" fill="#ff5c00" />
+    </g>
+  </g>
+</svg>

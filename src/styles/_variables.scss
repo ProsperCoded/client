@@ -1,0 +1,74 @@
+$primary-font: "Montserrat";
+$secondary-font: "Nunito";
+@include embed-font(
+  $primary-font,
+  "../Montserrat-VariableFont_wght.woff2",
+  "woff2"
+);
+@include embed-font(
+  $secondary-font,
+  "../Nunito-VariableFont_wght.woff2",
+  "woff2"
+);
+
+@mixin darkThemeMixin() {
+  --color-neutral: #383838;
+  --code-neutral: 56, 56, 56;
+  --color-neutral-dark: #272727;
+  --code-neutral-dark: 39, 39, 39;
+  --color-neutral-light: #d6d6d6;
+  --code-neutral-light: 214, 214, 214;
+  --color-light: white;
+  --color-dark: rgb(2 6 23);
+  --code-light: 255, 255, 255;
+  --code-dark: 0, 0, 0;
+
+  --background-image: url("../static/background-dark.jpg");
+}
+@mixin lightThemeMixin() {
+  --color-neutral: #d6d6d6;
+  --code-neutral: 214, 214, 214;
+  --color-neutral-light: rgb(39, 39, 39);
+  --code-neutral-light: 39, 39, 39;
+  --color-neutral-dark: #d6d6d6;
+  --code-neutral-dark: 214, 214, 214;
+  --background-image: url("../static/background.jpg");
+  --color-light: rgb(2 6 23);
+  --color-dark: white;
+  --code-light: 0, 0, 0;
+  --code-dark: 255, 255, 255;
+  // --backdrop-filter-app-background: contrast(2);
+}
+// Colors
+
+:root {
+  --color-primary: #ff6913;
+  --color-primary-dark: #d45710;
+  --color-primary-light: #ffcdb0;
+  --color-secondary: #312e4e;
+  --code-secondary: 49, 46, 78;
+  --color-secondary-transparent: rgba(var(--code-secondary), 0.4);
+  --color-secondary-light: #4a4480;
+  --color-secondary-dark: #100f1b;
+  // --color-accent: "";
+  @include lightThemeMixin();
+
+  --nav-height: 5rem;
+  // Fonts
+  --font-primary: "Montserrat";
+  --font-secondary: "Nunito";
+  // Extras
+  // --backdrop-filter-app-background: brightness(0.3) grayscale(1) contrast(2);
+}
+
+.dark {
+  @include darkThemeMixin();
+}
+.light {
+  @include lightThemeMixin();
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    @include lightThemeMixin();
+  }
+}

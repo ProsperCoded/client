@@ -1,0 +1,95 @@
+@import "./styles/globalMixins";
+@import "./styles/variables";
+
+// Base Styles
+@include ImplementBase();
+// Components
+@import "./components/nav/Nav.scss";
+@import "./pages/Pages.scss";
+@import "./components/Main/Main.scss";
+@import "./components/DashboardDisplay/DashboardDisplay.scss";
+@import "./components/Features/Features.scss";
+@import "./components/Footer/Footer.scss";
+@import "./components/Explorer/Explorer.scss";
+
+.app {
+  color: var(--color-neutral-light);
+  min-height: 100vh;
+}
+
+body {
+  // background-color: white;
+  background-image: var(--background-image);
+  background-size: 100% auto;
+  position: relative;
+  background-repeat: repeat-y;
+}
+.btn {
+  @include reset-button-input();
+  &--primary {
+    background-color: var(--color-primary);
+    @apply px-1 py-0.5 lg:py-2 lg:px-3 transition-colors rounded-2sm hover:rounded-md hover:text-primary-light;
+    height: fit-content;
+    color: white;
+    &:hover {
+      background-color: var(--color-primary-dark);
+    }
+  }
+}
+.highlight {
+  @apply py-2 px-4;
+  @apply rounded-md;
+  // padding: 10% 10%;
+  color: white;
+  width: fit-content;
+
+  background: linear-gradient(
+    109.6deg,
+    rgb(245, 113, 52) 12.6%,
+    rgb(100, 49, 172) 91.1%
+  );
+  font-family: $secondary-font;
+}
+
+.block-container {
+  @apply w-auto mt-[7vh] md:mt-[10vh] mx-8;
+
+  &__heading {
+    @apply text-center mx-auto text-xl lg:text-4xl font-bold my-4;
+    font-family: var(--font-primary);
+  }
+}
+
+a.link {
+  transition: 200ms color linear;
+  &:hover {
+    color: var(--color-light);
+  }
+}
+.text-shadow {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+i {
+  @apply mx-2;
+}
+.icon {
+  aspect-ratio: 1/1;
+  width: 1.4rem;
+  svg {
+    fill: whitesmoke;
+  }
+}
+.file-image {
+  position: relative;
+  &::after {
+    content: attr(data-fileType);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.2rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    @apply text-slate-100;
+  }
+}
