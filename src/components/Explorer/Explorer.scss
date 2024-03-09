@@ -94,7 +94,7 @@
     text-align: start;
   }
   .file {
-    @apply hover:bg-secondary-light transition-colors;
+    @apply hover:bg-secondary-light;
   }
   .file[data-checked="true"] {
     @apply bg-secondary;
