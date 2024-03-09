@@ -257,41 +257,60 @@ function includeChecked(
   });
   return filesWithChecked as filesTableViewDataType;
 }
-function mapIndex(
+function mapIndexSelectItem(
   locationPath: number[],
-  data: filesTableViewDataType | fileTableViewDataType,
-  modifier: (args: fileTableViewDataType) => fileTableViewDataType
-): filesTableViewDataType | fileTableViewDataType {
+  data: filesTableViewDataType,
+  modifier: (
+    args: fileTableViewDataType | filesTableViewDataType
+  ) => fileTableViewDataType | filesTableViewDataType
+): filesTableViewDataType {
   let modifiedFiles;
 
-  if (locationPath.length > 1 && _.isArray(data)) {
+  if (locationPath.length > 1) {
     let file = data[locationPath[0]];
     if (file.type === "directory") {
-      file.content = mapIndex(
+      file.content = mapIndexSelectItem(
         _.drop(locationPath, 1),
         file.content,
         modifier
-      ) as any;
+      );
       data[locationPath[0]] = file;
-    } else {
-      data[locationPath[0]] = mapIndex(
-        _.drop(locationPath, 1),
-        file,
-        modifier
-      ) as any;
     }
-    modifiedFiles = data;
   } else {
-    if (_.isArray(data)) {
-      data[locationPath[0]] = modifier(data[locationPath[0]]);
-      modifiedFiles = data;
-    } else {
-      modifiedFiles = modifier(data);
-    }
+    let file = data[locationPath[0]];
+    let result = modifier(data[locationPath[0]]);
+    data[locationPath[0]] = result as any;
+    // data = result;
   }
-  return modifiedFiles as filesTableViewDataType | fileTableViewDataType;
-}
+  modifiedFiles = data;
 
+  return modifiedFiles as filesTableViewDataType;
+}
+function mapIndexSelectList(
+  locationPath: number[],
+  data: filesTableViewDataType,
+  modifier: (
+    files: fileTableViewDataType | filesTableViewDataType
+  ) => filesTableViewDataType
+): filesTableViewDataType {
+  let modifiedFiles;
+  console.log("data:", data, locationPath);
+  if (locationPath.length > 0) {
+    let file = data[locationPath[0]];
+    if (file.type === "directory") {
+      file.content = mapIndexSelectList(
+        _.drop(locationPath, 1),
+        file.content,
+        modifier
+      );
+      data[locationPath[0]] = file;
+    }
+  } else {
+    data = modifier(data);
+  }
+  modifiedFiles = data;
+  return modifiedFiles as filesTableViewDataType;
+}
 function FilesTableView() {
   const [files, setFiles] = useContext(FilesContext);
 
@@ -330,7 +349,6 @@ function FilesTableView() {
       case SortingDataActions.SortByNameDescending:
         newState = [...SortByNameDescending(state)];
         return newState;
-
       case SortingDataActions.SortBySize:
         newState = [...SortBySize(state)];
         return newState;
@@ -338,23 +356,36 @@ function FilesTableView() {
         newState = [...SortBySizeDescending(state)];
         return newState;
       case SortingDataActions.DeleteSelected:
-        locationPath = action.data.index as number[];
-        // newState = mapIndex(locationPath, [...state], (file) => {});
-        newState = state.filter((f) => !f.checked);
-        let originalOrderSorted = files.map((f) =>
-          newState.find((s) => s.id === f.id)
+        locationPath = action.data.locationPath as number[];
+        // Will index selected files with undefined, as this are for deletion
+        console.log("location path :", locationPath);
+        newState = mapIndexSelectList(
+          locationPath,
+          [...state],
+          (files: fileTableViewDataType | filesTableViewDataType) => {
+            console.log("file before", files);
+            if (_.isArray(files)) {
+              let result = files.filter((f) => {
+                return !f.checked;
+              });
+              return result;
+            }
+            console.log("files after", files);
+            return files;
+          }
         );
-        let realFiles = _.compact(originalOrderSorted);
-        setFiles(realFiles);
+        // setFiles(newState)
         return newState;
       case SortingDataActions.SelectFile:
         locationPath = action.data.index as number[];
         const checked = action.data.checked as boolean;
-        const prevState = [...state];
-        newState = mapIndex(locationPath, prevState, (file) => {
+
+        // const prevState = [...state];
+        newState = mapIndexSelectItem(locationPath, [...state], (file) => {
+          console.log("selecting file", locationPath, file);
           return { ...file, checked };
         }) as filesTableViewDataType;
-        console.log("sorted", newState);
+
         return newState;
       case SortingDataActions.AllSelection:
         newState = includeChecked([...state], action.data.checked);
@@ -384,7 +415,7 @@ function FilesTableView() {
         },
         files
       );
-      console.log("directory data", directoryData);
+      // console.log("directory data", directoryData);
       return directoryData as filesTableViewDataType;
     },
     [sortedFilesData, userLocationPath]
@@ -405,8 +436,9 @@ function FilesTableView() {
       getAllPathIndex(sortedFilesData)
     );
     return (
-      <ul className="path flex gap-x-3">
-        {/* {allPathIndex.map(index, dept)} */}
+      <ul className="path-nav flex gap-x-3">
+        <li>Root</li>
+        {userLocationPath.map((index, dept) => {})}
       </ul>
     );
   };
