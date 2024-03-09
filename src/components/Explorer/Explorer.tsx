@@ -2,6 +2,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useId,
   useMemo,
   useReducer,
   useRef,
@@ -121,6 +122,13 @@ enum SortingDataActions {
   SelectFile,
   AllSelection,
 }
+enum SortRule {
+  Default,
+  SortByName,
+  SortByNameDescending,
+  SortBySize,
+  SortBySizeDescending,
+}
 // function File({name, fileSize, sharedTo}:{name:string}){
 //   return ()
 // }
@@ -168,17 +176,27 @@ const filesData: (File | Directory)[] = [
   {
     id: "6",
     type: "directory",
-    name: "document_frame.png",
+    name: "document_frame",
     fileSizeKilobyte: 33,
     sharedTo: 100,
     lastModified: "2021-01-01",
     content: [
       {
         id: "7",
-        type: "file",
-        name: "image_frame.png",
+        type: "directory",
+        name: "image_frame",
         fileSizeKilobyte: 4444,
         sharedTo: 100,
+        content: [
+          {
+            id: "7",
+            type: "file",
+            name: "image_frame",
+            fileSizeKilobyte: 4444,
+            sharedTo: 100,
+            lastModified: "2021-01-01",
+          },
+        ],
         lastModified: "2021-01-01",
       },
       {
@@ -261,7 +279,7 @@ function mapIndexSelectItem(
   locationPath: number[],
   data: filesTableViewDataType,
   modifier: (
-    args: fileTableViewDataType | filesTableViewDataType
+    file: fileTableViewDataType
   ) => fileTableViewDataType | filesTableViewDataType
 ): filesTableViewDataType {
   let modifiedFiles;
@@ -289,9 +307,7 @@ function mapIndexSelectItem(
 function mapIndexSelectList(
   locationPath: number[],
   data: filesTableViewDataType,
-  modifier: (
-    files: fileTableViewDataType | filesTableViewDataType
-  ) => filesTableViewDataType
+  modifier: (files: filesTableViewDataType) => filesTableViewDataType
 ): filesTableViewDataType {
   let modifiedFiles;
   console.log("data:", data, locationPath);
@@ -316,53 +332,78 @@ function FilesTableView() {
 
   let [userLocationPath, setUserLocationPath] = useState<number[]>([]);
   let SortByName = (data: filesTableViewDataType) => {
-    return data.sort((a, b) => {
-      return a.name.localeCompare(b.name);
+    let sortedNames = data.sort((file1, file2) => {
+      return file1.name.localeCompare(file2.name);
     });
+    let sortedNamesWithCorrectIndex = sortedNames.map((file) => {
+      let originalIndex = data.findIndex((_file) => {
+        return _.isEqual(_file, file);
+      });
+      return [file, originalIndex] as [fileTableViewDataType, number];
+    });
+    return sortedNamesWithCorrectIndex;
   };
   let SortByNameDescending = (data: filesTableViewDataType) => {
-    return data.sort((a, b) => {
-      return b.name.localeCompare(a.name);
+    let sortedNames = data.sort((file1, file2) => {
+      return file2.name.localeCompare(file1.name);
     });
+    let sortedNamesWithCorrectIndex = sortedNames.map((file) => {
+      let originalIndex = data.findIndex((_file) => {
+        return _.isEqual(_file, file);
+      });
+      return [file, originalIndex] as [fileTableViewDataType, number];
+    });
+    return sortedNamesWithCorrectIndex;
   };
   let SortBySize = (data: filesTableViewDataType) => {
-    return data.sort((a, b) => {
-      return a.fileSizeKilobyte - b.fileSizeKilobyte;
+    let sortedNames = data.sort((file1, file2) => {
+      return file1.fileSizeKilobyte - file2.fileSizeKilobyte;
     });
+    let sortedNamesWithCorrectIndex = sortedNames.map((file) => {
+      let originalIndex = data.findIndex((_file) => {
+        return _.isEqual(_file, file);
+      });
+      return [file, originalIndex] as [fileTableViewDataType, number];
+    });
+    return sortedNamesWithCorrectIndex;
   };
   let SortBySizeDescending = (data: filesTableViewDataType) => {
-    return data.sort((a, b) => {
-      return b.fileSizeKilobyte - a.fileSizeKilobyte;
+    let sortedNames = data.sort((file1, file2) => {
+      return file2.fileSizeKilobyte - file1.fileSizeKilobyte;
     });
+    let sortedNamesWithCorrectIndex = sortedNames.map((file) => {
+      let originalIndex = data.findIndex((_file) => {
+        return _.isEqual(_file, file);
+      });
+      return [file, originalIndex] as [fileTableViewDataType, number];
+    });
+    return sortedNamesWithCorrectIndex;
   };
 
   function SortingReducer(
-    state: filesTableViewDataType,
+    state: { files: filesTableViewDataType; sortRule: SortRule },
     action: { type: SortingDataActions; data?: any }
   ) {
     let newState = state;
     let locationPath: number[];
+    let files: filesTableViewDataType;
     switch (action.type) {
       case SortingDataActions.SortByName:
-        newState = [...SortByName(state)];
-        return newState;
+        return { ...state, sortRule: SortRule.SortByName };
       case SortingDataActions.SortByNameDescending:
-        newState = [...SortByNameDescending(state)];
-        return newState;
+        return { ...state, sortRule: SortRule.SortByNameDescending };
       case SortingDataActions.SortBySize:
-        newState = [...SortBySize(state)];
-        return newState;
+        return { ...state, sortRule: SortRule.SortBySize };
       case SortingDataActions.SortBySizeDescending:
-        newState = [...SortBySizeDescending(state)];
-        return newState;
+        return { ...state, sortRule: SortRule.SortBySizeDescending };
       case SortingDataActions.DeleteSelected:
         locationPath = action.data.locationPath as number[];
         // Will index selected files with undefined, as this are for deletion
         console.log("location path :", locationPath);
-        newState = mapIndexSelectList(
+        files = mapIndexSelectList(
           locationPath,
-          [...state],
-          (files: fileTableViewDataType | filesTableViewDataType) => {
+          [...state.files],
+          (files: filesTableViewDataType) => {
             console.log("file before", files);
             if (_.isArray(files)) {
               let result = files.filter((f) => {
@@ -375,35 +416,53 @@ function FilesTableView() {
           }
         );
         // setFiles(newState)
-        return newState;
+        return { ...state, files };
       case SortingDataActions.SelectFile:
         locationPath = action.data.index as number[];
         const checked = action.data.checked as boolean;
 
         // const prevState = [...state];
-        newState = mapIndexSelectItem(locationPath, [...state], (file) => {
+        files = mapIndexSelectItem(locationPath, [...state.files], (file) => {
           console.log("selecting file", locationPath, file);
           return { ...file, checked };
         }) as filesTableViewDataType;
 
-        return newState;
+        return { ...state, files };
       case SortingDataActions.AllSelection:
-        newState = includeChecked([...state], action.data.checked);
-        return newState;
+        files = includeChecked([...state.files], action.data.checked);
+        return { ...state, files };
       default:
         return state;
     }
   }
 
-  const [sortedFilesData, dispatcher] = useReducer(
-    SortingReducer,
-    includeChecked(files)
-  );
+  const [sortedFilesData, dispatcher] = useReducer(SortingReducer, {
+    files: includeChecked(files),
+    sortRule: SortRule.Default,
+  });
   // let [mapFiles, setMapFiles] = useState(FileTreeBuilder(sortedFilesData));
+  const sort = useMemo(() => {
+    return (
+      files: filesTableViewDataType
+    ): [fileTableViewDataType, number][] => {
+      switch (sortedFilesData.sortRule) {
+        case SortRule.SortByName:
+          return SortByName(files);
+        case SortRule.SortByNameDescending:
+          return SortByNameDescending(files);
+        case SortRule.SortBySize:
+          return SortBySize(files);
+        case SortRule.SortBySizeDescending:
+          return SortBySizeDescending(files);
+        default:
+          return files.map((file, index) => [file, index]);
+      }
+    };
+  }, [sortedFilesData, userLocationPath]);
 
   const currentLocation = useMemo(
     () => () => {
-      let files = sortedFilesData;
+      let files = sortedFilesData.files;
       let locationPath = userLocationPath;
       if (locationPath.length === 0) {
         return files;
@@ -433,17 +492,37 @@ function FilesTableView() {
   }
   const PathIndexComponent = () => {
     const [allPathIndex, setAllPathIndex] = useState(
-      getAllPathIndex(sortedFilesData)
+      getAllPathIndex(sortedFilesData.files)
+    );
+    let paths: JSX.Element[] = [];
+    userLocationPath.reduce(
+      (accumulator: number[], currentValue: number, indexDept) => {
+        let location = accumulator.concat(currentValue);
+        let name = "";
+        mapIndexSelectItem(location, sortedFilesData.files, (file) => {
+          name = file.name;
+          return file;
+        });
+        let path = (
+          <li onClick={() => setUserLocationPath(location)} key={useId()}>
+            {name}
+          </li>
+        );
+        paths.push(path);
+        return location;
+      },
+      []
     );
     return (
-      <ul className="path-nav flex gap-x-3">
-        <li>Root</li>
-        {userLocationPath.map((index, dept) => {})}
+      <ul className="path-nav flex gap-x-3 w-full p-2 mb-2">
+        <li onClick={() => setUserLocationPath([])}>Root</li>
+        {paths}
       </ul>
     );
   };
   return (
     <div className="files files--table-view gap-y-2">
+      <PathIndexComponent />
       <div className="files__header">
         <button
           className="files__head"
@@ -505,7 +584,10 @@ function FilesTableView() {
         </button>
       </div>
       <div className="h-auto overflow-y-auto max-h-[50vh] py-4">
-        {currentLocation().map((file, index) => {
+        {sort(currentLocation()).map((fileAndIndex) => {
+          const file = fileAndIndex[0];
+
+          const index = fileAndIndex[1];
           const extension = getExtension(file.name);
 
           return (

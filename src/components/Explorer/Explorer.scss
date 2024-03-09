@@ -99,4 +99,15 @@
   .file[data-checked="true"] {
     @apply bg-secondary;
   }
+
+  .path-nav {
+    li {
+      // background-color: var(--color-secondary-light);
+      transition: 0.2s background-color linear;
+      @apply bg-secondary-light py-2 px-4 cursor-pointer;
+      &:hover {
+        background-color: var(--color-secondary);
+      }
+    }
+  }
 }
