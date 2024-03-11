@@ -3,7 +3,8 @@ import { ReactSVG } from "react-svg";
 import logoSvg from "./../../../assets/logo.svg";
 import { Avatar, Checkbox } from "antd";
 import Search from "antd/es/input/Search";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { MessageAPIContext } from "../../../App";
 // import { Progress } from "../../_globalComponents";
 
 function ExplorerNav({
@@ -16,6 +17,7 @@ function ExplorerNav({
   // const [files, setFiles]
   const [searchValue, setSearchValue] = useState<string>("");
   const searchElement = useRef<null | HTMLElement>(null);
+  let messageApi = useContext(MessageAPIContext);
   useEffect(() => {
     document.addEventListener("keydown", (event) => {
       if (event.ctrlKey && event.key === "k" && searchElement.current) {
@@ -36,7 +38,7 @@ function ExplorerNav({
         <span className="logo-label text-wrap">Parcel Share</span>
       </Link>
       <div className="md:flex hidden items-center flex-grow max-w-lg">
-        <span className="xl:block font-bold font-primary text-lg mx-2">
+        <span className="hidden xl:block font-bold font-primary text-lg mx-2">
           Explorer
         </span>
         <Search
@@ -55,7 +57,13 @@ function ExplorerNav({
             )
           }
           placeholder="Search File"
-          onSearch={onSearch}
+          onSearch={(value: string) => {
+            if (!value) {
+              messageApi!.warning("Can't Search, Empty Search Query");
+              return;
+            }
+            onSearch(value);
+          }}
           onInput={(e: any) => {
             let value = e.target.value as string;
             setSearchValue(value);

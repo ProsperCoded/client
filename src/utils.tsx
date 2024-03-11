@@ -24,10 +24,12 @@ export function FileSvgIcon({
   fill,
   stroke,
   extension,
+  className,
 }: {
   fill: string;
   stroke: string;
   extension: string;
+  className?: string;
 }) {
   return (
     <svg
@@ -35,6 +37,7 @@ export function FileSvgIcon({
       width="25"
       height="25"
       viewBox="0 0 16 16"
+      className={`file-svg ${className}`}
     >
       <path
         id="Path_1"
@@ -63,7 +66,7 @@ export function FileSvgIcon({
         fill={stroke}
       >
         <tspan x="0" y="0">
-          PNG
+          {extension}
         </tspan>
       </text>
     </svg>

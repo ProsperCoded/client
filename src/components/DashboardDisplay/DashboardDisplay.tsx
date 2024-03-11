@@ -72,7 +72,7 @@ function SupportedFiles() {
       <div
         className={`supported-file border-slate-400 border-2 bg-slate-600 p-2 my-2 gap-2 rounded-md grid grid-cols-[auto_1fr] justify-items-center items-center shadow-lg`}
       >
-        <div className={`file-image w-8 row-span-2 `} data-fileType={fileType}>
+        <div className={`file-image w-8 row-span-2 `} data-filetype={fileType}>
           <FileSvg fill="whitesmoke" stroke="gray" />
         </div>
         <span className="bg-slate-500 w-[90%] h-3  block justify-self-start rounded-md"></span>

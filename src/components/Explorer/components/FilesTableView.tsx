@@ -8,7 +8,7 @@ import { FileSvgIcon, getExtension } from "../../../utils";
 import { FilesContext, UserLocationPathContext } from "../Explorer";
 import { Checkbox } from "antd";
 import _ from "lodash";
-enum SortingDataActions {
+export enum SortingDataActions {
   SortByName,
   SortByNameDescending,
   SortBySize,
@@ -60,7 +60,6 @@ function mapIndexSelectItem(
     let file = data[locationPath[0]];
     let result = modifier(data[locationPath[0]]);
     data[locationPath[0]] = result as any;
-    // data = result;
   }
   modifiedFiles = data;
 
@@ -89,7 +88,16 @@ function mapIndexSelectList(
   modifiedFiles = data;
   return modifiedFiles as filesTableViewDataType;
 }
-function FilesTableView() {
+function FilesTableView({
+  setDispatcher,
+}: {
+  setDispatcher: (
+    dispatcher: React.Dispatch<{
+      type: SortingDataActions;
+      data?: any;
+    }>
+  ) => void;
+}) {
   const [files, setFiles] = useContext(FilesContext);
   const [userLocationPath, setUserLocationPath] = useContext(
     UserLocationPathContext
@@ -178,13 +186,10 @@ function FilesTableView() {
             return files;
           }
         );
-        // setFiles(newState)
         return { ...state, files };
       case SortingDataActions.SelectFile:
         locationPath = action.data.index as number[];
         const checked = action.data.checked as boolean;
-
-        // const prevState = [...state];
         files = mapIndexSelectItem(locationPath, [...state.files], (file) => {
           console.log("selecting file", locationPath, file);
           return { ...file, checked };
@@ -203,6 +208,7 @@ function FilesTableView() {
     files: includeChecked(files),
     sortRule: SortRule.Default,
   });
+  setDispatcher(dispatcher);
   // let [mapFiles, setMapFiles] = useState(FileTreeBuilder(sortedFilesData));
   const sort = useMemo(() => {
     return (
@@ -253,9 +259,6 @@ function FilesTableView() {
     return someChecked && !allChecked;
   }
   const PathIndexComponent = () => {
-    // const [allPathIndex, setAllPathIndex] = useState(
-    //   getAllPathIndex(sortedFilesData.files)
-    // );
     let paths: JSX.Element[] = [];
     userLocationPath.reduce(
       (accumulator: number[], currentValue: number, indexDept) => {
@@ -283,7 +286,7 @@ function FilesTableView() {
     );
   };
   return (
-    <div className="files files--table-view gap-y-2">
+    <div className="files files--table-view gap-y-2 text-sm lg:text-base">
       <PathIndexComponent />
       <div className="files__header">
         <button
@@ -373,29 +376,24 @@ function FilesTableView() {
               }}
               data-checked={file.checked}
             >
-              <span className="file__data flex items-center gap-x-2">
-                <Checkbox
-                  className="p-2 "
-                  checked={file.checked as boolean}
-                  // onChange={() => {
-                  //   console.log("checked");
-                  // }}
-                />
+              <span className="file__data flex items-center gap-x-1 lg:gap-x-2 ">
+                <Checkbox className="p-1" checked={file.checked as boolean} />
                 {file.type === "file" ? (
                   <FileSvgIcon
                     fill="var(--color-secondary-light)"
                     stroke="whitesmoke"
                     extension={extension.toUpperCase()}
+                    className="hidden lg:block"
                   />
                 ) : (
                   <i
-                    className="bi bi-folder"
-                    style={{ fontSize: "1.5rem", margin: "0" }}
+                    className="bi bi-folder text-sm md:text-lg m-0 p-0"
+                    // style={{ margin: "0" }}
                   ></i>
                 )}
                 {file.name}
               </span>
-              <span className="file__data">{file.fileSizeKilobyte}</span>
+              <span className="file__data">{file.fileSizeKilobyte} kb</span>
               <span className="file__data">{file.sharedTo}</span>
               <span className="file__data">{file.lastModified}</span>
             </div>

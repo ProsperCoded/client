@@ -32,3 +32,8 @@ type fileTableViewDataType =
     });
 
 type filesTableViewDataType = fileTableViewDataType[];
+
+type FlatFilesAndLocationIndexesType = {
+  data: File | Directory;
+  locationPath: number[];
+}[];
